@@ -11,6 +11,6 @@ K-Means algorithm with OpenMP
 * stopping criterion
 * mini-batch implementation
 
-## Additional notes
+## Performance
 
 * ~2x slower than Python scikitlearn's k_means (single threaded)
