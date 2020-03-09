@@ -7,6 +7,7 @@ Compiled on windows 10: -std=c++14 -O3 -fopenmp
 
 * upgrade gcc version (currently 4.9.2)
 * use latest OpenMP features after gcc upgrade (currently OpenMP 4.0)
+* make PRNG thread safe
 
 ## Less important
 
