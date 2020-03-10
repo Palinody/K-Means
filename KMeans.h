@@ -159,10 +159,7 @@ void norm_1(T& elem){
 
 template<typename T>
 void KMeans<T>::mapSampleToCentroid(){
-    /**
-     * TODO: extend matrix 
-    */
-   /*
+   /* OLD VERSION
     for(int c = 0; c < _n_clusters; ++c){
         Matrix<T> curr_cluster = _centroids.getSlice(0, _dims, c, c+1);
         Matrix<T> training_set_cpy = _training_set;
