@@ -17,4 +17,7 @@ Compiled on windows 10: -std=c++14 -O3 -fopenmp
 ## Performance
 
 * ~2.5x faster than Python scikitlearn's k_means (single threaded)
-test: 100,000 3D data samples, 35 iter, 4 clusters 
+tested on following data: 
+* 100,000 3D data samples
+* 35 iter, 
+* (4, 8, 16, 32, 64) clusters 
