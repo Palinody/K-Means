@@ -24,7 +24,7 @@ tested with:
 * #iter: 35
 * time computed by taking the average over 7 runs
 
-| n_clusters | sklearn (ms)  | c++(ser.)(ms)  | perf. gain (sklearn/c++) |c++(par.)(ms)| perf. gain (ser./par.)|
+| n_clusters | sklearn(ms)   | c++(ser.)(ms)  | perf. gain(sklearn/c++) |c++(par.)(ms)| perf. gain (ser./par.)|
 | :---       |:---:          |:---:           |---:                      |:---:        |---:                   |
 |     2      | 214 ± 1.3     |  54 ± 3.39     |3.96|-|-|
 |     4      | 348 ± 3.26    |  91 ± 2.84     |3.82|-|-|
