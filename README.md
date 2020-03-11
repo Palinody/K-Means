@@ -20,9 +20,10 @@ Compiled on windows 10: -std=c++14 -O3 -fopenmp
 
 tested with:
 
-* data size: 3x100,000
-* #iter: 35
+* data shape: 3x100,000
+* num. iter: 35
 * time computed by taking the average over 7 runs
+* parallel tests performed with 4 threads
 
 | n_clusters | sklearn(ms)   | c++(ser.)(ms)  |  perf. gain(sklearn/c++) |c++(par.)(ms)| perf. gain (ser./par.)|
 | :---       |:---:          |:---:           |---:                      |:---:        |---:                   |
