@@ -11,7 +11,7 @@ Compiled on windows 10: -std=c++14 -O3 -fopenmp
 
 ## Less important
 
-* stopping criterion
+* stopping criterion :heavy_check_mark:
 * mini-batch implementation
 
 ## Performance
