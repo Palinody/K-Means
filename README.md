@@ -22,15 +22,16 @@ tested with:
 
 * data size: 3x100,000
 * #iter: 35
+* time computed by taking the average over 7 runs
 
-| n_clusters | sklearn (s)  | c++(serial)(s) | c++(parallel)(s)| perf. gain |
-| :---       |:---:         |:---:           |:---:            |---:        |
-|     2      |     -        |     -          |     -           |     -      |
-|     4      |     -        |     -          |     -           |     -      |
-|     8      |     -        |     -          |     -           |     -      |
-|     16     |     -        |     -          |     -           |     -      |
-|     32     |     -        |     -          |     -           |     -      |
-|     64     |     -        |     -          |     -           |     -      |
+| n_clusters | sklearn (ms)  | c++(ser.)(ms)  | perf. gain (sklearn/c++) |c++(par.)(ms)| perf. gain (ser./par.)|
+| :---       |:---:          |:---:           |---:                      |:---:        |---:                   |
+|     2      | 214 ± 1.3     |  54 ± 3.39     |3.96|-|-|
+|     4      | 348 ± 3.26    |  91 ± 2.84     |3.82|-|-|
+|     8      | 556 ± 7.57    | 165 ± 3.41     |3.36|-|-|
+|     16     | 898 ± 19.5    | 309 ± 5.7      |2.91|-|-|
+|     32     |1530 ± 16.7    | 586 ± 8.59     |2.61|-|-|
+|     64     |2730 ± 15.7    |1143 ± 6.34     |2.39|-|-|
 
 
 **sklearn tested the following way with IPython Jupyter notebook**
