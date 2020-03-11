@@ -16,9 +16,7 @@ Compiled on windows 10: -std=c++14 -O3 -fopenmp
 
 ## Performance
 
-* ~2.5x faster than Python sklearn's k_means (single threaded)
-
-tested with:
+tested against Python's sklearn library with the following data and hyperparameters:
 
 * data shape: 3x100,000
 * num. iter: 35
