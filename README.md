@@ -46,4 +46,4 @@ DATASET = np.random.rand(100000, 3)
                                                 return_n_iter=True)
 ```
 
-![k_means](https://user-images.githubusercontent.com/32341154/76554682-8fe14a80-6496-11ea-8d36-4d75a3be0169.png)
+![k_means](https://user-images.githubusercontent.com/32341154/76555027-2ca3e800-6497-11ea-9f9b-3c9c7616d970.png)
