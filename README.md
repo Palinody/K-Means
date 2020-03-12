@@ -23,7 +23,7 @@ tested against Python's sklearn library with the following data and hyperparamet
 * time computed by taking the average over 7 runs
 * parallel tests performed with 4 threads
 
-| n_clusters | sklearn<br />time (ms)| c++(ser.)<br />time (ms)|  c++/sklearn comp.<br />time ratio (%)|c++(par.)<br />time (ms)| par./ser.<br />time ratio (%)|
+| n_clusters | sklearn<br />time (ms)| c++(ser.)<br />time (ms)|  c++/sklearn<br />time ratio (%)|c++(par.)<br />time (ms)| par./ser.<br />time ratio (%)|
 | :---       |:---:          |:---:           |---:                      |:---:        |---:                   |
 |     2      | 214 ± 1.3     |  51 ±7.6      |23.83| 203 ±9.02|398.04|-|
 |     4      | 348 ± 3.26    |  78 ±7.3      |22.41| 228 ±8.35|292.31|-|
