@@ -23,14 +23,14 @@ tested against Python's sklearn library with the following data and hyperparamet
 * time computed by taking the average over 7 runs
 * parallel tests performed with 4 threads
 
-| n_clusters | sklearn<br />(ms)   | c++(ser.)(ms)  |  time requ.(c++/sklearn) |c++(par.)(ms)| perf. gain (ser./par.)|
+| n_clusters | sklearn<br />time (ms)| c++(ser.)<br />time (ms)|  c++/sklearn comp.<br />time ratio (%)|c++(par.)<br />time (ms)| par./ser.<br />time ratio (%)|
 | :---       |:---:          |:---:           |---:                      |:---:        |---:                   |
-|     2      | 214 ± <br />1.3     |  51 ±7.6      |4.20| 203 ±9.02|0.25|-|
-|     4      | 348 ± 3.26    |  78 ±7.3      |4.46| 228 ±8.35|0.34|-|
-|     8      | 556 ± 7.57    | 127 ±5.89     |4.38| 237 ±5.90|0.54|-|
-|     16     | 898 ± 19.5    | 234 ±9.02     |3.84| 294 ±6.05|0.80|-|
-|     32     |1530 ± 16.7    | 444 ±8.25     |3.44| 344 ±9.01|1.29|-|
-|     64     |2730 ± 15.7    | 837 ±8.35     |3.26| 463 ±7.36|1.81|-|
+|     2      | 214 ± 1.3     |  51 ±7.6      |23.83| 203 ±9.02|398.04|-|
+|     4      | 348 ± 3.26    |  78 ±7.3      |22.41| 228 ±8.35|292.31|-|
+|     8      | 556 ± 7.57    | 127 ±5.89     |22.84| 237 ±5.90|186.61|-|
+|     16     | 898 ± 19.5    | 234 ±9.02     |26.06| 294 ±6.05|125.64|-|
+|     32     |1530 ± 16.7    | 444 ±8.25     |29.02| 344 ±9.01|77.48|-|
+|     64     |2730 ± 15.7    | 837 ±8.35     |30.66| 463 ±7.36|55.32|-|
 
 
 **sklearn tested the following way with IPython Jupyter notebook**
