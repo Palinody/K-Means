@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix);
 template<typename T>
 class Matrix {
 public:
-	Matrix(int mum_threads = 1);
+	Matrix(int num_threads = 1);
 	Matrix(int rows, int cols, T value = 0, int num_threads = 1);
 	Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int num_threads = 1);
 	Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const T* param_vect2, int num_threads = 1);
@@ -1207,8 +1207,8 @@ const T& Matrix<T>::operator()(const int& row, const int& col) const {
 
 template<typename T>
 Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other) {
-	size_t new_rows = other.getRows();
-	size_t new_cols = other.getCols();
+	int new_rows = other.getRows();
+	int new_cols = other.getCols();
 
 	_matrix = std::make_unique<T[]>(new_rows*new_cols);
 
