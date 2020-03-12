@@ -15,7 +15,9 @@ Compiled on windows 10: -std=c++14 -O3 -fopenmp
 * mini-batch implementation
 * streams
 
-## Performance
+# Performance
+
+## Computation
 
 tested against Python's sklearn library with the following data and hyperparameters:
 
@@ -49,3 +51,7 @@ DATASET = np.random.rand(100000, 3)
 ```
 
 ![k_means](https://user-images.githubusercontent.com/32341154/76555027-2ca3e800-6497-11ea-9f9b-3c9c7616d970.png)
+
+## Convergence
+
+...
