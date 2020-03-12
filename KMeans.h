@@ -5,25 +5,43 @@
 template<typename T>
 class ClosestCentroids : public Matrix<int>{
 public:
-    ClosestCentroids(int num_threads = 1) : 
-        Matrix<int>(num_threads){
-    }
-    
-	ClosestCentroids(int rows, int cols, int value = 0, int num_threads = 1) : 
-        Matrix<int>(rows, cols, value, num_threads){ 
 
+    /**
+      * with 2 rows we need to init the matrix with the same data on both lines
+      * The first one is computed w.r.t. data and cluster. 2nd one is a copy.
+      * The reason behind that is that EVERY closestCentroid is GUARANTED to
+      * be modified during initialization but is NOT during the next iteration.
+      * Some data that do not satisfy the if(read_val > abs_sum) criterion may
+      * remain with the initialized centroids, which are wrong.
+      */
+	ClosestCentroids(int rows, int cols, Matrix<T> data, Matrix<T> cluster, int value = 0, int num_threads = 1) : 
+        Matrix<int>(rows, cols, value, num_threads),
+        _toggle{ 1 } { 
+        
+        initDistBuffer();
+        getClosest(data, cluster);
+        #pragma omp parallel for simd num_threads(_n_threads)
+        for(int i = 0; i < _cols; ++i){
+            _matrix[i+_cols] = _matrix[i]; // copying row_idx 0 data into row_idx 1
+        }
+    }
+
+    ClosestCentroids(int rows, int cols, int value = 0, int num_threads = 1) : 
+        Matrix<int>(rows, cols, value, num_threads){ 
+        
         initDistBuffer();
     }
+
     ~ClosestCentroids(){ free(_distBuffer); }
 
     /**
      * Gets closest cluster index w.r.t. each sample
      * 
      * Dimensions:
-     *      rows: 1
+     *      rows: 1 (2 if toggle feature activated)
      *      cols: n_samples
     */
-    ClosestCentroids& getDistance(const Matrix<T>& data, const Matrix<T>& cluster){
+    ClosestCentroids& getClosest(const Matrix<T>& data, const Matrix<T>& cluster){
         int n_dims = data.getRows();
         int n_clusters = cluster.getCols();
 
@@ -41,24 +59,62 @@ public:
                     #pragma omp atomic write
                     (*this->_distBuffer)(0, i) = abs_sum;
                     #pragma omp atomic write
-                    this->_matrix[i] = c;
+                    this->_matrix[i+_toggled_row*_cols] = c; // i: iterating over features
                 }
             }
         }
+        
+        _current_row = _toggled_row;
+        _toggled_row ^= _toggle;
         return *this;
     }
+
+    /**
+     * Checks whether the stopping criterion is satisfied or not.
+     * If 2 consecutive closest centroids computation's modification
+     * rate that is below the given threshold, we consider that 
+     * KMeans has converged 
+    */
+    float getModifRate(){
+        // stopping criterion never satisfied if we dont keep track of assigned centroids modifications
+        if(_rows < 2) return 0.0f;
+        assert(_rows == 2);
+        int counter = 0;
+        #pragma omp parallel for num_threads(_n_threads)
+        for(int i = 0; i < _cols; ++i){
+            const int& a = _matrix[i];
+            const int& b = _matrix[i+_cols];
+            if(!(a ^ b)) ++counter;
+        }
+        return 1.0f - static_cast<float>(counter) / _cols;
+        
+    }
+
+    int& operator()(const int& col) {
+	    return this->_matrix[col+_current_row*_cols];
+    }
+
+    const int& operator()(const int& col) const {
+	    return this->_matrix[col+_current_row*_cols];
+    }
+
 private:
     Matrix<T> *_distBuffer;
+    // we want to store the previous state of mapped centroids, toggle: 1 to switch between rows
+    int _toggle = 0;
+    // we store the toggled row
+    int _toggled_row = 0;
+    int _current_row = 0;
 
     void initDistBuffer(){
-        _distBuffer = new Matrix<T>(1, this->_cols, std::numeric_limits<float>::max(), this->_n_threads);
+        _distBuffer = new Matrix<T>(1, _cols, std::numeric_limits<float>::max(), _n_threads);
     }
 };
 
 template<typename T>
 class KMeans{
 public:
-    KMeans(const Matrix<T>& dataset, int n_clusters, int n_threads=1);
+    KMeans(const Matrix<T>& dataset, int n_clusters, bool stop_criterion=true, int n_threads=1);
     ~KMeans(){ free(_dataset_to_centroids); }
 
     Matrix<T> getCentroid();
@@ -67,12 +123,13 @@ public:
     T computeDist(const Matrix<T>& first, const Matrix<T>& second);
     void mapSampleToCentroid();
     void updateCentroids();
-    void run(int max_iter);
+    void run(int max_iter, float threashold=-1);
 
     void print();
 
 
 private:
+    bool _stop_crit;
     int _n_threads;
     /**
      * number of features of the dataset (x0, x1, ..., xn)
@@ -116,14 +173,19 @@ private:
      *      and check for changes.
      *      If almost no change -> stop algorithm
     */
-    //Matrix<int> _dataset_to_centroids;
+    // Matrix<int> _dataset_to_centroids;
     ClosestCentroids<T> *_dataset_to_centroids;
+    /**
+     * save _dataset_to_centroids from prev iteration for stopping criterion
+     * */
+    Matrix<T> *_dataset_to_centroids_prev;
 };
 
 template<typename T>
-KMeans<T>::KMeans(const Matrix<T>& dataset, int n_clusters, int n_threads) : 
+KMeans<T>::KMeans(const Matrix<T>& dataset, int n_clusters, bool stop_criterion, int n_threads) : 
         _training_set{ dataset },
         _n_clusters{ n_clusters },
+        _stop_crit{ stop_criterion },
         _n_threads{ n_threads } {
         
     _training_set = dataset;
@@ -139,7 +201,8 @@ KMeans<T>::KMeans(const Matrix<T>& dataset, int n_clusters, int n_threads) :
     _n_clusters = n_clusters;
     _centroids.setThreads(_n_threads);
 
-    _dataset_to_centroids = new ClosestCentroids<T>(1, _samples, -1, _n_threads);
+    if(stop_criterion){ _dataset_to_centroids = new ClosestCentroids<T>(2, _samples, _training_set, _centroids, 0, _n_threads); }
+    else{ _dataset_to_centroids = new ClosestCentroids<T>(1, _samples, 0, _n_threads); }
 }
 
 template<typename T>
@@ -159,7 +222,10 @@ void norm_1(T& elem){
 
 template<typename T>
 void KMeans<T>::mapSampleToCentroid(){
-   /* OLD VERSION
+    /**
+     * TODO: extend matrix 
+    */
+   /*
     for(int c = 0; c < _n_clusters; ++c){
         Matrix<T> curr_cluster = _centroids.getSlice(0, _dims, c, c+1);
         Matrix<T> training_set_cpy = _training_set;
@@ -169,7 +235,7 @@ void KMeans<T>::mapSampleToCentroid(){
     }
     _dataset_to_centroids = _distBuff.hMinIndex();
     */
-   _dataset_to_centroids->getDistance(_training_set, _centroids);
+   _dataset_to_centroids->getClosest(_training_set, _centroids);
 }
 
 template<typename T>
@@ -183,7 +249,8 @@ void KMeans<T>::updateCentroids(){
 
     #pragma omp parallel for num_threads(_n_threads)
     for(int i = 0; i < _samples; ++i){
-        int k_index = (*_dataset_to_centroids)(0, i);
+        const int& k_index = (*_dataset_to_centroids)(i);
+        assert(k_index != -1);
         #pragma omp simd
         for(int d = 0; d < _dims; ++d){
             _centroids(d, k_index) += _training_set(d, i);
@@ -202,12 +269,27 @@ void KMeans<T>::updateCentroids(){
 }
 
 template<typename T>
-void KMeans<T>::run(int max_iter){
-    for(int epoch = 0; epoch < max_iter; ++epoch){
+void KMeans<T>::run(int max_iter, float threashold){
+    //while(!_dataset_to_centroids->isEqual())
+
+    this->mapSampleToCentroid();
+    this->updateCentroids();
+    if(max_iter == 1) return;
+    int epoch = 1;
+    float modif_rate_prev;
+    float modif_rate_curr = 1;
+    float inertia;
+    do {
         this->mapSampleToCentroid();
         this->updateCentroids();
-        //std::printf("%4d\r", epoch);
-    }
+        modif_rate_prev = modif_rate_curr;
+        modif_rate_curr = _dataset_to_centroids->getModifRate();
+        inertia = modif_rate_prev - modif_rate_curr;
+        //printf("%.3f %.3f\n", modif_rate_curr, (modif_rate_prev - modif_rate_curr));
+        ++epoch;
+    } while(epoch < max_iter && modif_rate_curr > threashold && inertia != 0);
+    //} while(epoch < max_iter);
+    printf("iter number: %d\n", epoch);
 }
 
 template<typename T>
