@@ -3,16 +3,17 @@ K-Means algorithm with OpenMP
 
 Compiled on windows 10: -std=c++14 -O3 -fopenmp
 
-## Important changes
+## TODO (important)
 
 * upgrade gcc version (currently 4.9.2)
 * use latest OpenMP features after gcc upgrade (currently OpenMP 4.0)
 * make PRNG thread safe
 
-## Less important
+## TODO (less important)
 
 * stopping criterion :heavy_check_mark:
 * mini-batch implementation
+* streams
 
 ## Performance
 
@@ -32,6 +33,7 @@ tested against Python's sklearn library with the following data and hyperparamet
 |     32     |1530 ± 16.7    | 444 ±8.25     |29.02| 344 ±9.01|77.48|-|
 |     64     |2730 ± 15.7    | 837 ±8.35     |30.66| 463 ±7.36|55.32|-|
 
+:exclamation: faster computation doesn't imply faster convergence. No tests have been performed in this regard yet.
 
 **sklearn tested the following way with IPython Jupyter notebook**
 ```python
