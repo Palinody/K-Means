@@ -45,3 +45,5 @@ DATASET = np.random.rand(100000, 3)
                                                 max_iter=35, tol=-1, algorithm="full", \
                                                 return_n_iter=True)
 ```
+
+![k_means](https://user-images.githubusercontent.com/32341154/76553981-56f4a600-6495-11ea-813c-7ab0fce45f1a.png)
