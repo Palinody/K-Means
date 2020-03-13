@@ -39,8 +39,6 @@ private:
     dist_uniform_t<T> _distr;
 };
 
-
-
 template<typename T>
 class normal_dist : public shared_generator{
 public:
