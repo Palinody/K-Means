@@ -1,19 +1,17 @@
 # K-Means
 K-Means algorithm with OpenMP
 
-Compiled on windows 10: -std=c++14 -O3 -fopenmp
+* compiled on windows 10: g++ -std=c++17 -O3 -fopenmp
+* mingw-w64: 7.0.0
+* GCC 9.2.0
+* OpenMP 5.0
 
-## TODO (important)
-
-* upgrade gcc version (currently 4.9.2)
-* use latest OpenMP features after gcc upgrade (currently OpenMP 4.0)
-* make PRNG thread safe
-
-## TODO (less important)
+## TODO
 
 * stopping criterion :heavy_check_mark:
 * mini-batch implementation
 * streams
+* thread safe prng :heavy_check_mark:
 
 # Performance
 
