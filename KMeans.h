@@ -118,7 +118,7 @@ public:
     ~KMeans(){ free(_dataset_to_centroids); }
 
     Matrix<T> getCentroid();
-    Matrix<int> getDataToCentroidMap();
+    Matrix<int> getDataToCentroid();
 
     T computeDist(const Matrix<T>& first, const Matrix<T>& second);
     void mapSampleToCentroid();
@@ -175,10 +175,6 @@ private:
     */
     // Matrix<int> _dataset_to_centroids;
     ClosestCentroids<T> *_dataset_to_centroids;
-    /**
-     * save _dataset_to_centroids from prev iteration for stopping criterion
-     * */
-    Matrix<T> *_dataset_to_centroids_prev;
 };
 
 template<typename T>
@@ -211,7 +207,7 @@ Matrix<T> KMeans<T>::getCentroid(){
 }
 
 template<typename T>
-Matrix<int> KMeans<T>::getDataToCentroidMap(){
+Matrix<int> KMeans<T>::getDataToCentroid(){
     return *static_cast<Matrix<int>* >(_dataset_to_centroids);
 }
 
@@ -225,7 +221,7 @@ void KMeans<T>::mapSampleToCentroid(){
     /**
      * TODO: extend matrix 
     */
-   /*
+   /* OLD METHOD
     for(int c = 0; c < _n_clusters; ++c){
         Matrix<T> curr_cluster = _centroids.getSlice(0, _dims, c, c+1);
         Matrix<T> training_set_cpy = _training_set;
@@ -287,9 +283,9 @@ void KMeans<T>::run(int max_iter, float threashold){
         inertia = modif_rate_prev - modif_rate_curr;
         //printf("%.3f %.3f\n", modif_rate_curr, (modif_rate_prev - modif_rate_curr));
         ++epoch;
-    } while(epoch < max_iter && modif_rate_curr > threashold && inertia != 0);
-    //} while(epoch < max_iter);
-    printf("iter number: %d\n", epoch);
+    //} while(epoch < max_iter && modif_rate_curr > threashold && inertia != 0);
+    } while(epoch < max_iter);
+    //printf("iter number: %d\n", epoch);
 }
 
 template<typename T>
