@@ -48,7 +48,7 @@ DATASET = np.random.rand(100000, 3)
                                                 return_n_iter=True)
 ```
 
-![k_means](https://user-images.githubusercontent.com/32341154/76555027-2ca3e800-6497-11ea-9f9b-3c9c7616d970.png)
+![k_means](https://user-images.githubusercontent.com/32341154/76665071-cb5b4200-6586-11ea-8810-be73367fd6c7.png)
 
 ## Convergence
 
