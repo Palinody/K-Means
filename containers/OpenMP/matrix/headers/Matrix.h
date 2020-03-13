@@ -27,9 +27,12 @@ class Matrix {
 public:
 	Matrix(int num_threads = 1);
 	Matrix(int rows, int cols, T value = 0, int num_threads = 1);
-	Matrix(int rows, int cols, RandEnum distr, T param1, float param2, int num_threads = 1);
-	Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const float* param_vect2, int num_threads = 1);
-	Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<float> param_matrix2, int num_threads = 1);
+	template<typename U>
+	Matrix(int rows, int cols, RandEnum distr, T param1, U param2, int num_threads = 1);
+	template<typename U>
+	Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const U* param_vect2, int num_threads = 1);
+	template<typename U>
+	Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<U> param_matrix2, int num_threads = 1);
 	Matrix(const T* array, int rows, int cols, int num_threads = 1);
 	// TEMPORARY constructor -> extend to variadic constructor
 	Matrix(const T* arr1, const T* arr2, int rows, int cols, int num_threads=1);
@@ -200,7 +203,8 @@ Matrix<T>::Matrix(int rows, int cols, T value, int num_threads) :
 					if distr LINEAR: min, max
 */
 template<typename T>
-Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, float param2, int num_threads) :
+template<typename U>
+Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, U param2, int num_threads) :
 	_rows{ rows }, _cols{ cols },
 	_n_threads{ num_threads },
 	_matrix{ std::make_unique<T[]>(rows*cols) } {
@@ -267,7 +271,8 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, float param2, in
 }
 
 template<typename T>
-Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const float* param_vect2, int num_threads) :
+template<typename U>
+Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const U* param_vect2, int num_threads) :
 	_rows{ rows }, _cols{ cols },
 	_n_threads{ num_threads },
 	_matrix{ std::make_unique<T[]>(rows*cols) }{
@@ -336,7 +341,8 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, cons
 }
 
 template<typename T>
-Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<float> param_matrix2, int num_threads) :
+template<typename U>
+Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<U> param_matrix2, int num_threads) :
 	_rows{ rows }, _cols{ cols },
 	_n_threads{ num_threads },
 	_matrix{ std::make_unique<T[]>(rows*cols) }{
