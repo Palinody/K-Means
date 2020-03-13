@@ -27,9 +27,9 @@ class Matrix {
 public:
 	Matrix(int num_threads = 1);
 	Matrix(int rows, int cols, T value = 0, int num_threads = 1);
-	Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int num_threads = 1);
-	Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const T* param_vect2, int num_threads = 1);
-	Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<T> param_matrix2, int num_threads = 1);
+	Matrix(int rows, int cols, RandEnum distr, T param1, float param2, int num_threads = 1);
+	Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const float* param_vect2, int num_threads = 1);
+	Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<float> param_matrix2, int num_threads = 1);
 	Matrix(const T* array, int rows, int cols, int num_threads = 1);
 	// TEMPORARY constructor -> extend to variadic constructor
 	Matrix(const T* arr1, const T* arr2, int rows, int cols, int num_threads=1);
@@ -200,7 +200,7 @@ Matrix<T>::Matrix(int rows, int cols, T value, int num_threads) :
 					if distr LINEAR: min, max
 */
 template<typename T>
-Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int num_threads) :
+Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, float param2, int num_threads) :
 	_rows{ rows }, _cols{ cols },
 	_n_threads{ num_threads },
 	_matrix{ std::make_unique<T[]>(rows*cols) } {
@@ -214,7 +214,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int nu
 	switch (distr) {
 		case UNIFORM:{
 			uniform_dist<T> r1(param1, param2);
-			#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+			#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 			for (int n = 0; n < _rows*_cols; ++n) {
 				_matrix[n] = r1();
 			}
@@ -222,7 +222,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int nu
 		}
 		case GAUSS:{
 			normal_dist<T> r2(param1, param2);
-			#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+			#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 			for (int n = 0; n < _rows*_cols; ++n) {
 				_matrix[n] = r2();
 			}
@@ -230,7 +230,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int nu
 		}
 		case NORMAL:{
 			normal_dist<T> r3(param1, param2);
-			#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+			#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 			for (int n = 0; n < _rows*_cols; ++n) {
 				_matrix[n] = r3();
 			}
@@ -238,7 +238,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int nu
 		}
 		case XAVIER:{
 			normal_dist<T> r4(0, sqrt(2/(param1+param2)));
-			#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+			#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 			for (int n = 0; n < _rows*_cols; ++n) {
 				_matrix[n] = r4();
 			}
@@ -267,7 +267,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, T param1, T param2, int nu
 }
 
 template<typename T>
-Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const T* param_vect2, int num_threads) :
+Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, const float* param_vect2, int num_threads) :
 	_rows{ rows }, _cols{ cols },
 	_n_threads{ num_threads },
 	_matrix{ std::make_unique<T[]>(rows*cols) }{
@@ -278,7 +278,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, cons
 		case UNIFORM:{
 			for(int i = 0; i < _rows; ++i){
 				uniform_dist<T> r1(param_vect1[i], param_vect2[i]);
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r1();
 				}
@@ -288,7 +288,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, cons
 		case GAUSS:{
 			for(int i = 0; i < _rows; ++i){
 				normal_dist<T> r2(param_vect1[i], param_vect2[i]);
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r2();
 				}
@@ -298,7 +298,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, cons
 		case NORMAL:{
 			for(int i = 0; i < _rows; ++i){
 				normal_dist<T> r3(param_vect1[i], param_vect2[i]);
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r3();
 				}
@@ -308,7 +308,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, cons
 		case XAVIER:{
 			for(int i = 0; i < _rows; ++i){
 				normal_dist<T> r4(0, sqrt(2/(param_vect1[i]+param_vect2[i])));
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r4();
 				}
@@ -336,7 +336,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, const T* param_vect1, cons
 }
 
 template<typename T>
-Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<T> param_matrix2, int num_threads) :
+Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, Matrix<float> param_matrix2, int num_threads) :
 	_rows{ rows }, _cols{ cols },
 	_n_threads{ num_threads },
 	_matrix{ std::make_unique<T[]>(rows*cols) }{
@@ -356,7 +356,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, M
 		case UNIFORM:{
 			for(int i = 0; i < _rows; ++i){
 				uniform_dist<T> r1(param_matrix1(0, i), param_matrix2(0, i));
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r1();
 				}
@@ -366,7 +366,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, M
 		case GAUSS:{
 			for(int i = 0; i < _rows; ++i){
 				normal_dist<T> r2(param_matrix1(0, i), param_matrix2(0, i));
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r2();
 				}
@@ -376,7 +376,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, M
 		case NORMAL:{
 			for(int i = 0; i < _rows; ++i){
 				normal_dist<T> r3(param_matrix1(0, i), param_matrix2(0, i));
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r3();
 				}
@@ -386,7 +386,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, M
 		case XAVIER:{
 			for(int i = 0; i < _rows; ++i){
 				normal_dist<T> r4(0, sqrt(2/(param_matrix1(0, i) + param_matrix2(0, i))));
-				#pragma omp simd//parallel for num_threads(1) if(_threads_enabled)
+				#pragma omp parallel for simd num_threads(_n_threads) if(_threads_enabled)
 				for (int j = 0; j < _cols; ++j) {
 					_matrix[j+i*_cols] = r4();
 				}
