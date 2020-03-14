@@ -4,13 +4,14 @@ K-Means algorithm with OpenMP
 * compiled on windows 10: g++ -std=c++17 -O3 -fopenmp
 * mingw-w64: 7.0.0
 * GCC 9.2.0
-* OpenMP 5.0
+* [OpenMP 5.0](https://www.openmp.org/wp-content/uploads/OpenMPRef-5.0-111802-web.pdf)
 
 ## TODO
 
 * stopping criterion :heavy_check_mark:
 * mini-batch implementation
 * streams
+* [algorithms](https://www.cplusplus.com/reference/algorithm/) 
 * thread safe prng :heavy_check_mark:
 
 # Performance
