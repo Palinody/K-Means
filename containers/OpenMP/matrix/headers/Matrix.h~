@@ -351,6 +351,7 @@ Matrix<T>::Matrix(int rows, int cols, RandEnum distr, Matrix<T> param_matrix1, M
 
 	if((param_matrix2.getCols() != param_matrix1.getCols()) || (param_matrix2.getRows() != param_matrix1.getRows())){
 		printf("Error: parametric matrices must be of same dimensions\n");
+		_exit(0);
 	}
 	else if(param_matrix1.getCols() == 1){
 		param_matrix1 = param_matrix1.transpose();
