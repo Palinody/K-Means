@@ -124,7 +124,7 @@ protected:
 
 	friend std::ostream& operator<< <>(std::ostream& out, const Matrix<T>& matrix);
        
-	T* begin() { return _matrix.get();
+	T* begin() { return _matrix.get(); }
 	T* end() { return begin() + _rows*_cols; }
     	const T* begin() const { return _matrix.get(); }
 	const T* end() const { return begin() + _rows*_cols; }

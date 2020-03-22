@@ -137,19 +137,22 @@ protected:
 			/// (SCALAR -- MATRIX) MATH. OPERATIONS (LHS) ///
 //////////////////////////////////////////////////////////////////////
 
-template<typename T, typename U>
+template<typename T>
+template<typename U>
 Matrix<T> operator+(U scalar, Matrix<T> rhs) {
 	T new_scalar = static_cast<T>(scalar);
 	return rhs += new_scalar;
 }
 
-template<typename T, typename U>
+template<typename T>
+template<typename U>
 Matrix<T> operator*(U scalar, Matrix<T> rhs) {
 	T new_scalar = static_cast<T>(scalar);
 	return rhs *= new_scalar;
 }
 
-template<typename T, typename U>
+template<typename T>
+template<typename U>
 Matrix<T> operator-(U scalar, Matrix<T> rhs) {
 	T new_scalar = static_cast<T>(scalar);
 	return new_scalar + (-rhs);
