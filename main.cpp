@@ -92,7 +92,7 @@ void sig(T& val){
 void KMeansBenckmark(const Matrix<float>& DATABASE, int n_centroids, double *time_arr, double *sd_arr, int iter){
     std::vector<double> time_buff;
     
-    static Timer<nanoseconds_t> timer_inner;
+    static Timer<nano_t> timer_inner;
 
     for(int i = 0; i < 7; ++i){
         KMeans<float> KM(DATABASE, n_centroids, false, 6);
@@ -124,7 +124,7 @@ void KMeansBenckmark(const Matrix<float>& DATABASE, int n_centroids, double *tim
 
 
 int main(int argc, char** argv){
-	Timer<nanoseconds_t> timer;
+	Timer<nano_t> timer;
 	//uint64_t time_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     /////////////////////////////
     

@@ -1,9 +1,9 @@
 #include <chrono>
 
-using seconds_t = std::chrono::seconds;
-using milliseconds_t = std::chrono::milliseconds;
-using microseconds_t = std::chrono::microseconds;
-using nanoseconds_t = std::chrono::nanoseconds;
+using sec_t   = std::chrono::seconds;
+using milli_t = std::chrono::milliseconds;
+using micro_t = std::chrono::microseconds;
+using nano_t  = std::chrono::nanoseconds;
 
 template<typename duration_t>
 class Timer{
