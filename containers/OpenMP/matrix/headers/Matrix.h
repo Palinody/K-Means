@@ -123,11 +123,15 @@ protected:
 	std::unique_ptr<T[]> _matrix;
 
 	friend std::ostream& operator<< <>(std::ostream& out, const Matrix<T>& matrix);
-
-	int *begin() { return _matrix.get(); }
-    int *end() { return begin() + _rows*_cols; }
-    int const *begin() const { return _matrix.get(); }
-    int const *end() const { return begin() + _rows*_cols; }
+       
+	T* begin() { return _matrix.get();
+	T* end() { return begin() + _rows*_cols; }
+    	const T* begin() const { return _matrix.get(); }
+	const T* end() const { return begin() + _rows*_cols; }
+	T* rowBegin(int row) { return begin() + row*_cols; }
+	T* rowEnd(int row) { return rowBegin(row) + _cols; }
+	const T* rowBegin(int row) const { return begin() + row*_cols; }
+	const T* rowEnd(int row) const { return rowBegin(row) + _cols; }
 };
 //////////////////////////////////////////////////////////////////////
 			/// (SCALAR -- MATRIX) MATH. OPERATIONS (LHS) ///
