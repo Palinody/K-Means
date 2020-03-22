@@ -1,0 +1,25 @@
+#include <chrono>
+
+using seconds_t = std::chrono::seconds;
+using miliseconds_t = std::chrono::milliseconds;
+using miliseconds_t = std::chrono::milliseconds;
+using microseconds_t = std::chrono::microseconds;
+using nanoseconds_t = std::chrono::nanoseconds;
+
+template<typename duration_t>
+class Timer{
+	using clock_t = std::chrono::system_clock;
+
+public:
+	Timer() : _start{ now() }{ }
+	
+	
+	uint64_t now() {
+		return std::chrono::duration_cast<duration_t>(clock_t::now().time_since_epoch()).count();
+	}
+	void reset(){ _start = now(); }
+	duration_t elapsed() const { return now() - start; }
+	
+private:
+	uint64_t _start;
+}
