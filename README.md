@@ -13,7 +13,7 @@ Compiled with:
 
 * stopping criterion :heavy_check_mark:
 * mini-batch implementation
-* streams
+* streams (.txt :heavy_check_mark:, .csv, .bin)
 * [algorithms](https://www.cplusplus.com/reference/algorithm/) 
 * thread safe prng :heavy_check_mark:
 
