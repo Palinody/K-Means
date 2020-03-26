@@ -1,6 +1,6 @@
 #pragma once
 
-#include "containers/OpenMP/matrix/headers/Matrix.h"
+#include "headers/Matrix.h"
 
 template<typename T>
 class ClosestCentroids : public Matrix<int>{
@@ -119,6 +119,7 @@ public:
 
     Matrix<T> getCentroid();
     Matrix<int> getDataToCentroid();
+    int getNIters();
 
     T computeDist(const Matrix<T>& first, const Matrix<T>& second);
     void mapSampleToCentroid();
@@ -131,6 +132,7 @@ public:
 private:
     bool _stop_crit;
     int _n_threads;
+    int _n_iters = 0;
     /**
      * number of features of the dataset (x0, x1, ..., xn)
     */
@@ -212,6 +214,11 @@ Matrix<int> KMeans<T>::getDataToCentroid(){
 }
 
 template<typename T>
+int KMeans<T>::getNIters(){
+	return _n_iters;
+}
+
+template<typename T>
 void norm_1(T& elem){
     elem = abs(elem);
 }
@@ -270,6 +277,7 @@ void KMeans<T>::run(int max_iter, float threashold){
 
     this->mapSampleToCentroid();
     this->updateCentroids();
+    _n_iters = 1;
     if(max_iter == 1) return;
     int epoch = 1;
     float modif_rate_prev;
@@ -283,8 +291,9 @@ void KMeans<T>::run(int max_iter, float threashold){
         inertia = modif_rate_prev - modif_rate_curr;
         //printf("%.3f %.3f\n", modif_rate_curr, (modif_rate_prev - modif_rate_curr));
         ++epoch;
-    //} while(epoch < max_iter && modif_rate_curr > threashold && inertia != 0);
-    } while(epoch < max_iter);
+    } while(epoch < max_iter && modif_rate_curr > threashold && inertia != 0);
+    //} while(epoch < max_iter);
+    _n_iters = epoch;
     //printf("iter number: %d\n", epoch);
 }
 
