@@ -24,36 +24,37 @@ Matrix<float> dataGenerator(int n){
     return database_generator;
 }
 
-Matrix<float> dataGenerator3D(int distr_samples){
+template<typename T>
+Matrix<T> dataGenerator3D(int distr_samples){
     // #data_points = #distr * distr_samples
     // 4 classes and 3 dimensions (x, y, z) -> 12 values
     // (µ_x_0, µ_y_0, µ_z_0), (..., ..., ...), (µ_x_c, µ_y_c,µ_z_c)
-    float mu_vect[] = {-1, 2, 3, \
-                        2, 1, -1, \
-                        4, -2, 2, \
-                        3, -1, 4};
-    float sd_vect[] = {0.5, 0.6, 0.4, \
+    T mu_vect[] = {1, 2, 3, \
+                        2, 1, 1, \
+                        4, 2, 2, \
+                        3, 1, 4};
+    T sd_vect[] = {0.5, 0.6, 0.4, \
                        0.8, 0.7, 0.5, \
                        1.2, 0.3, 0.8, \
                        0.3, 0.5, 0.4};
-    Matrix<float> database_generator(12, distr_samples, GAUSS, mu_vect, sd_vect, 1);
+    Matrix<T> database_generator(12, distr_samples, GAUSS, mu_vect, sd_vect, 1);
 
-    Matrix<float> dataX = database_generator.row(0); 
+    Matrix<T> dataX = database_generator.row(0); 
     dataX.hStack(database_generator.row(3));
     dataX.hStack(database_generator.row(6));
     dataX.hStack(database_generator.row(9));
 
-    Matrix<float> dataY = database_generator.row(1);
+    Matrix<T> dataY = database_generator.row(1);
     dataY.hStack(database_generator.row(4));
     dataY.hStack(database_generator.row(7));
     dataY.hStack(database_generator.row(10));
 
-    Matrix<float> dataZ = database_generator.row(2);
+    Matrix<T> dataZ = database_generator.row(2);
     dataZ.hStack(database_generator.row(5));
     dataZ.hStack(database_generator.row(8));
     dataZ.hStack(database_generator.row(11));
 
-    Matrix<float> DATABASE(dataX);
+    Matrix<T> DATABASE(dataX);
     DATABASE.vStack(dataY);
     DATABASE.vStack(dataZ);
     return DATABASE;
@@ -170,15 +171,33 @@ int main(int argc, char** argv){
 	//uint64_t time_start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     /////////////////////////////
     
-   	 //Matrix<float> DATABASE(dataX, 1, 400, 4);
+   	//Matrix<float> DATABASE(dataX, 1, 400, 4);
     	//DATABASE.vStack(dataY, 1, 400);
     	//DATABASE.vStack(dataZ, 1, 400);
-    	//Matrix<float> DATABASE = dataGenerator3D(25000);
-    
-    	//KMeans<float> KM(DATABASE, 32, true);
+    Matrix<double> DATABASE = dataGenerator3D<double>(25000);
+	// save database that has been used
+	std::string path = "data/output/k-means-database.txt";
+	TXTParser<double> txt1(path);
+	txt1.putData(DATABASE.begin(), DATABASE.end(), DATABASE.getRows(), DATABASE.getCols(), path, false, ',');
+    	
+	timer.reset();
+    KMeans<double> KM(DATABASE, 4, true, 4);
+	KM.run(50, 0.00001);
+	Matrix<double> centroid = KM.getCentroid();
+	Matrix<int> dataToCentroid = KM.getDataToCentroid();
+	std::cout << "KMeans time: " << (timer.elapsed()*1e-9) << std::endl;
+	std::cout << "KMeans iters: " << KM.getNIters() << std::endl;
+	//std::cout << "Centroids: \n" << centroid << std::endl;
+	KM.print();
+	//std::cout << "data to centroids: \n" << dataToCentroid << std::endl;
+	std::string to_path = "data/output/k-means-dataToCentroid.txt";
+	TXTParser<int> txt(to_path);
+	txt.putData(dataToCentroid.begin(), dataToCentroid.end(), dataToCentroid.getRows(), dataToCentroid.getCols(), to_path, false, ','); 
+	
 
-    	// [2, 100]
-    		
+	// Benchmarking Convergence
+	/*
+    	// [2, 100]  		
     	Matrix<float> DATABASE = dataGenerator3D(25000);
 	// save database that has been used
 	std::string path = "data/output/k-means-database.txt";
@@ -233,7 +252,7 @@ int main(int argc, char** argv){
        	 	std::cout << sd_errors_arr[n] << ", ";
     	}
    	std::cout << "]" << std::endl;
-
+	*/
     	/////////////////////////////
     	uint64_t total_time = timer.elapsed();
     	printf("total time: %.5f\n", (total_time*1e-9));
