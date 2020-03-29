@@ -80,7 +80,7 @@ public:
     float getModifRate(){
         // stopping criterion never satisfied if we dont keep track of assigned centroids modifications
         if(_rows < 2) return 0.0f;
-        assert(_rows == 2);
+        //assert(_rows == 2);
         int counter = 0;
         #pragma omp parallel for num_threads(_n_threads)
         for(int i = 0; i < _cols; ++i){

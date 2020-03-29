@@ -11,8 +11,9 @@ Compiled with:
 
 ## TODO
 
-* stopping criterion :heavy_check_mark:
+* stopping criterion
 * mini-batch implementation
+* centroid initialization
 * streams (.txt :heavy_check_mark:, .csv, .bin)
 * [algorithms](https://www.cplusplus.com/reference/algorithm/) 
 * thread safe prng :heavy_check_mark:
@@ -54,6 +55,17 @@ DATASET = np.random.rand(100000, 3)
 
 ![k_means](https://user-images.githubusercontent.com/32341154/76665071-cb5b4200-6586-11ea-8810-be73367fd6c7.png)
 
-## Convergence
+# Convergence
 
-...
+c++ generally converges with **more** iteration in a **shorter** amount of time than sklearn: (c++ n=14, t\~0.035s | sklearn n=10, t\~0.093s)
+for a similar result. The speed at which it converges can be improved with a different initialization technique. The current approach is to naively initialize the centroids to random points generated from a uniform distribution bounded by the min-max values of the training set w.r.t. each dimension. The stopping criterion also needs improvement.
+
+## Ground truth data
+
+![k-means-ground-truth](https://user-images.githubusercontent.com/32341154/77862438-a10eb300-721b-11ea-9ef6-d5ae325ad15f.png)
+
+## sklearn-cpp
+
+sklearn             |  c++
+:-------------------------:|:-------------------------:
+![k-means-sklearn-2d](https://user-images.githubusercontent.com/32341154/77862427-93f1c400-721b-11ea-93d9-4e864a2cc6d7.png)  |  ![k-means-cpp-2d](https://user-images.githubusercontent.com/32341154/77862434-9a803b80-721b-11ea-9d67-454ce925d31f.png)

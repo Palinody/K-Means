@@ -181,8 +181,8 @@ int main(int argc, char** argv){
 	txt1.putData(DATABASE.begin(), DATABASE.end(), DATABASE.getRows(), DATABASE.getCols(), path, false, ',');
     	
 	timer.reset();
-    KMeans<double> KM(DATABASE, 4, true, 4);
-	KM.run(50, 0.00001);
+    KMeans<double> KM(DATABASE, 4, true, 1);
+	KM.run(15, -1);
 	Matrix<double> centroid = KM.getCentroid();
 	Matrix<int> dataToCentroid = KM.getDataToCentroid();
 	std::cout << "KMeans time: " << (timer.elapsed()*1e-9) << std::endl;

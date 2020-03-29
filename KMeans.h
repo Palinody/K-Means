@@ -112,20 +112,6 @@ int KMeans<T>::getNIters(){
 
 template<typename T>
 void KMeans<T>::mapSampleToCentroid(){
-    /**
-     * TODO: extend matrix 
-    */
-   // OLD METHOD
-   /*
-    for(int c = 0; c < _n_clusters; ++c){
-        Matrix<T> curr_cluster = _centroids->getSlice(0, _dims, c, c+1);
-        Matrix<T> training_set_cpy = _training_set;
-        training_set_cpy.hBroadcast(curr_cluster, SUB);
-        training_set_cpy.applyFunc(norm_1);
-        _distBuff.insert(training_set_cpy.vSum(), c, c+1, 0, _samples);
-    }
-    _dataset_to_centroids = _distBuff.hMinIndex();
-    */
     _dataset_to_centroids->getClosest(_training_set, *_centroids);
 }
 
@@ -163,6 +149,8 @@ template<typename T>
 void KMeans<T>::run(int max_iter, float threashold){
     //while(!_dataset_to_centroids->isEqual())
 
+    std::vector<float> modif_rate_buff(1, 1);
+
     this->mapSampleToCentroid();
     this->updateCentroids();
     _n_iters = 1;
@@ -176,10 +164,11 @@ void KMeans<T>::run(int max_iter, float threashold){
         this->updateCentroids();
         modif_rate_prev = modif_rate_curr;
         modif_rate_curr = _dataset_to_centroids->getModifRate();
+        modif_rate_buff.push_back(modif_rate_curr);
         inertia = modif_rate_prev - modif_rate_curr;
         printf("%.3f %.3f\n", modif_rate_curr, (modif_rate_prev - modif_rate_curr));
         ++epoch;
-    } while(epoch < max_iter /* && modif_rate_curr > threashold */ && inertia >= std::abs(threashold));
+    } while(epoch < max_iter && modif_rate_curr >= threashold  /*&& inertia >= std::abs(threashold)*/);
     //} while(epoch < max_iter && modif_rate_curr > threashold);
     //} while(epoch < max_iter);
     _n_iters = epoch;
