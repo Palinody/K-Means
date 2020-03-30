@@ -19,11 +19,11 @@ public:
         _toggle{ 1 } { 
         
         initDistBuffer();
-        getClosest(data, cluster);
-        #pragma omp parallel for simd num_threads(_n_threads)
-        for(int i = 0; i < _cols; ++i){
-            _matrix[i+_cols] = _matrix[i]; // copying row_idx 0 data into row_idx 1
-        }
+        //getClosest(data, cluster);
+        //#pragma omp parallel for simd num_threads(_n_threads)
+        //for(int i = 0; i < _cols; ++i){
+        //    _matrix[i+_cols] = _matrix[i]; // copying row_idx 0 data into row_idx 1
+        //}
     }
 
     ClosestCentroids(int rows, int cols, int value = 0, int num_threads = 1) : 
@@ -45,7 +45,7 @@ public:
         int n_dims = data.getRows();
         int n_clusters = cluster.getCols();
 
-        #pragma omp parallel for collapse(2) num_threads(_n_threads)
+        #pragma omp parallel for collapse(1) num_threads(_n_threads)
         for(int i = 0; i < _cols; ++i){
 
             //Matrix<T> min_buff(1, n_clusters, -1);

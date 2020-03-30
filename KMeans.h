@@ -151,8 +151,8 @@ void KMeans<T>::run(int max_iter, float threashold){
 
     std::vector<float> modif_rate_buff(1, 1);
 
-    this->mapSampleToCentroid();
-    this->updateCentroids();
+    mapSampleToCentroid();
+    updateCentroids();
     _n_iters = 1;
     if(max_iter == 1) return;
     int epoch = 1;
@@ -160,8 +160,8 @@ void KMeans<T>::run(int max_iter, float threashold){
     float modif_rate_curr = 1;
     float inertia;
     do {
-        this->mapSampleToCentroid();
-        this->updateCentroids();
+        mapSampleToCentroid();
+        updateCentroids();
         modif_rate_prev = modif_rate_curr;
         modif_rate_curr = _dataset_to_centroids->getModifRate();
         modif_rate_buff.push_back(modif_rate_curr);

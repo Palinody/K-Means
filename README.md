@@ -11,7 +11,7 @@ Compiled with:
 
 ## TODO
 
-* stopping criterion
+* stopping criterion :heavy_check_mark:
 * mini-batch implementation
 * centroid initialization
 * streams (.txt :heavy_check_mark:, .csv, .bin)
