@@ -52,11 +52,7 @@ public:
 				' ');
 			// parse content of line
 			std::stringstream ss(line);
-
-			for(size_t j = 0; j < 11; ++j){
-				ss >> container[j];
-				std::cout << container[j] << std::endl;
-			}
+			for(size_t j = 0; j < _cols; ++j){ ss >> container[j]; }
 		}
 		read.close();
 	}
@@ -83,9 +79,7 @@ public:
 				' ');
 			// parse content of line
 			std::stringstream ss(line);
-			for(size_t j{ 0 }; j < _cols; ++j, ++Begin){
-				ss >> *Begin;
-			}
+			for(size_t j{ 0 }; j < _cols; ++j, ++Begin){ ss >> *Begin; }
 		}
 		file.close();
 	}
@@ -99,7 +93,6 @@ public:
 		for(int i = 0; i < rows; ++i){
 			for(int j = 0; j < cols-1; ++j, ++Begin){
 				file << *Begin << separator;
-
 			}
 			// add last element + newline carriage
 			file << *Begin << '\n';
@@ -109,18 +102,10 @@ public:
 	}
 
 private:
-	/**
-	 * Needs to be private since we dont close the file
-	 * */	
-	
-
 	// absolute path
 	std::string _path; 
 	size_t _rows = 0;
 	size_t _cols = 0;
-	// keeps track of curr row/line in file
-	// size_t _curr_row = 0;
-	// size_t _curr_col = 0;
 };
 
 

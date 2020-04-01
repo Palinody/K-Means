@@ -7,10 +7,6 @@ template<typename T>
 class KMeans{
 public:
     KMeans(const Matrix<T>& dataset, int n_clusters, bool stop_criterion=true, int n_threads=1);
-    ~KMeans(){ 
-        free(_dataset_to_centroids); 
-        free(_centroids);
-    }
 
     Matrix<T> getCentroid();
     Matrix<int> getDataToCentroid();
@@ -36,7 +32,7 @@ private:
     */
     int _samples;
     /**
-    * desired number of clusters
+     * desired number of clusters 
     */
     int _n_clusters; 
     /**
@@ -45,13 +41,12 @@ private:
      *      N: number of dimensions
      *      K: number of classes/clusters
     */
-    Matrix<T> *_centroids;
+    std::unique_ptr<Matrix<T>> _centroids;
     /**
      * By convention, _training_set is a NxM matrix
      * where:
      *      N: number of dimensions
-     *      M: number of training samples
-     * 
+     *      M: number of training samples 
     */
     Matrix<T> _training_set;
     /**
@@ -69,8 +64,7 @@ private:
      *      and check for changes.
      *      If almost no change -> stop algorithm
     */
-    // Matrix<int> _dataset_to_centroids;
-    ClosestCentroids<T> *_dataset_to_centroids;
+    std::unique_ptr<ClosestCentroids<T>> _dataset_to_centroids;
 };
 
 template<typename T>
@@ -88,37 +82,26 @@ KMeans<T>::KMeans(const Matrix<T>& dataset, int n_clusters, bool stop_criterion,
     Matrix<T> vMinValues = _training_set.vMin();
     Matrix<T> vMaxValues = _training_set.vMax();
 
-    _centroids = new Matrix<T> (_dims, n_clusters, UNIFORM, vMinValues, vMaxValues);
+    _centroids = std::make_unique<Matrix<T>>(_dims, n_clusters, UNIFORM, vMinValues, vMaxValues);
     _centroids->setThreads(_n_threads);
 
-    if(stop_criterion){ _dataset_to_centroids = new ClosestCentroids<T>(2, _samples, _training_set, *_centroids, 0, _n_threads); }
-    else{ _dataset_to_centroids = new ClosestCentroids<T>(1, _samples, 0, _n_threads); }
+    _dataset_to_centroids = std::make_unique<ClosestCentroids<T>>(_samples, 0, stop_criterion, _n_threads);
 }
 
 template<typename T>
-Matrix<T> KMeans<T>::getCentroid(){
-    return *_centroids;
-}
+inline Matrix<T> KMeans<T>::getCentroid(){ return *_centroids; }
 
 template<typename T>
-Matrix<int> KMeans<T>::getDataToCentroid(){
-    return *static_cast<Matrix<int>* >(_dataset_to_centroids);
-}
+inline Matrix<int> KMeans<T>::getDataToCentroid(){ return *static_cast<Matrix<int>* >(_dataset_to_centroids.get()); }
 
 template<typename T>
-int KMeans<T>::getNIters(){
-	return _n_iters;
-}
+inline int KMeans<T>::getNIters(){ return _n_iters; }
 
 template<typename T>
-void KMeans<T>::mapSampleToCentroid(){
-    _dataset_to_centroids->getClosest(_training_set, *_centroids);
-}
+void KMeans<T>::mapSampleToCentroid(){ _dataset_to_centroids->getClosest(_training_set, *_centroids); }
 
 template<typename T>
 void KMeans<T>::updateCentroids(){
-    //_centroids = new Matrix<T>(_dims, _n_clusters, 0, _n_threads);
-    
     // number of points assigned to a cluster
     int occurences[_n_clusters] = {0};
     // accumulates the samples to compute new cluster positions
@@ -127,7 +110,6 @@ void KMeans<T>::updateCentroids(){
     #pragma omp parallel for num_threads(_n_threads)
     for(int i = 0; i < _samples; ++i){
         const int& k_index = (*_dataset_to_centroids)(i);
-        //assert(k_index != -1);
         #pragma omp simd
         for(int d = 0; d < _dims; ++d){
             sample_buff[k_index+d*_n_clusters] += _training_set(d, i);
@@ -135,7 +117,6 @@ void KMeans<T>::updateCentroids(){
         #pragma omp atomic
         ++occurences[k_index];
     }
-
     #pragma omp parallel for num_threads(_n_threads)
     for(int c = 0; c < _n_clusters; ++c){
         if(!occurences[c]) continue;
@@ -147,28 +128,24 @@ void KMeans<T>::updateCentroids(){
 
 template<typename T>
 void KMeans<T>::run(int max_iter, float threashold){
-    //while(!_dataset_to_centroids->isEqual())
-
-    std::vector<float> modif_rate_buff(1, 1);
 
     mapSampleToCentroid();
     updateCentroids();
     _n_iters = 1;
     if(max_iter == 1) return;
     int epoch = 1;
-    float modif_rate_prev;
-    float modif_rate_curr = 1;
+    float modif_rate_prev = 0;
+    float modif_rate_curr;
     float inertia;
     do {
         mapSampleToCentroid();
         updateCentroids();
-        modif_rate_prev = modif_rate_curr;
         modif_rate_curr = _dataset_to_centroids->getModifRate();
-        modif_rate_buff.push_back(modif_rate_curr);
-        inertia = modif_rate_prev - modif_rate_curr;
-        printf("%.3f %.3f\n", modif_rate_curr, (modif_rate_prev - modif_rate_curr));
+        inertia = modif_rate_curr - modif_rate_prev;
+        modif_rate_prev = modif_rate_curr;
+        printf("%.3f %.3f\n", modif_rate_curr, inertia);
         ++epoch;
-    } while(epoch < max_iter && modif_rate_curr >= threashold  /*&& inertia >= std::abs(threashold)*/);
+    } while(epoch < max_iter && modif_rate_curr >= threashold  /*&& std::abs(inertia) >= 1e-6*/);
     //} while(epoch < max_iter && modif_rate_curr > threashold);
     //} while(epoch < max_iter);
     _n_iters = epoch;

@@ -7,33 +7,14 @@ class ClosestCentroids : public Matrix<int>{
 public:
 
     /**
-      * with 2 rows we need to init the matrix with the same data on both lines
-      * The first one is computed w.r.t. data and cluster. 2nd one is a copy.
-      * The reason behind that is that EVERY closestCentroid is GUARANTED to
-      * be modified during initialization but is NOT during the next iteration.
-      * Some data that do not satisfy the if(read_val > abs_sum) criterion may
-      * remain with the initialized centroids, which are wrong.
-      */
-	ClosestCentroids(int rows, int cols, Matrix<T> data, Matrix<T> cluster, int value = 0, int num_threads = 1) : 
-        Matrix<int>(rows, cols, value, num_threads),
-        _toggle{ 1 } { 
-        
-        initDistBuffer();
-        //getClosest(data, cluster);
-        //#pragma omp parallel for simd num_threads(_n_threads)
-        //for(int i = 0; i < _cols; ++i){
-        //    _matrix[i+_cols] = _matrix[i]; // copying row_idx 0 data into row_idx 1
-        //}
-    }
-
-    ClosestCentroids(int rows, int cols, int value = 0, int num_threads = 1) : 
-        Matrix<int>(rows, cols, value, num_threads){ 
+     * if buffered ClosestCentroids desired -> 2 rows else 1
+    */
+	ClosestCentroids(int samples, int value = 0, bool buffered=true, int num_threads = 1) : 
+        Matrix<int>((buffered?2:1), samples, value, num_threads),
+        _toggle{ (buffered?1:0) } { 
         
         initDistBuffer();
     }
-
-    ~ClosestCentroids(){ free(_distBuffer); }
-
     /**
      * Gets closest cluster index w.r.t. each sample
      * 
@@ -47,13 +28,11 @@ public:
 
         #pragma omp parallel for collapse(1) num_threads(_n_threads)
         for(int i = 0; i < _cols; ++i){
-
-            //Matrix<T> min_buff(1, n_clusters, -1);
             T abs_sum = 0;
             for(int d = 0; d < n_dims; ++d){
                 abs_sum += std::abs(data(d, i) - cluster(d, 0));
             }
-            _matrix[i+_current_row*_cols] = 0;
+            _matrix[i+_toggled_row*_cols] = 0;
             (*_distBuffer)(0, i) = abs_sum;
             for(int c = 1; c < n_clusters; ++c){
                 abs_sum = 0;
@@ -61,7 +40,7 @@ public:
                     abs_sum += std::abs(data(d, i) - cluster(d, c));
                 }
                 if(abs_sum < (*_distBuffer)(0, i)){
-                    _matrix[i+_current_row*_cols] = c;
+                    _matrix[i+_toggled_row*_cols] = c;
                     (*_distBuffer)(0, i) = abs_sum;
                 }
             }
@@ -79,8 +58,7 @@ public:
     */
     float getModifRate(){
         // stopping criterion never satisfied if we dont keep track of assigned centroids modifications
-        if(_rows < 2) return 0.0f;
-        //assert(_rows == 2);
+        if(_rows < 2) return 1.0f;
         int counter = 0;
         #pragma omp parallel for num_threads(_n_threads)
         for(int i = 0; i < _cols; ++i){
@@ -88,24 +66,18 @@ public:
             const int& b = _matrix[i+_cols];
             if(!(a ^ b)) ++counter;
         }
-        return 1.0f - static_cast<float>(counter) / _cols;
-        
+        return 1.0f - static_cast<float>(counter) / _cols;   
     }
 
-    int& operator()(const int& col) {
-	    return _matrix[col+_current_row*_cols];
-    }
-
-    const int& operator()(const int& col) const {
-	    return _matrix[col+_current_row*_cols];
-    }
+    inline int& operator()(const int& col) { return _matrix[col+_current_row*_cols]; }
+    inline const int& operator()(const int& col) const { return _matrix[col+_current_row*_cols]; }
 
 private:
     void initDistBuffer(){
-        _distBuffer = new Matrix<T>(1, _cols, std::numeric_limits<T>::max(), _n_threads);
+        _distBuffer = std::make_unique<Matrix<T>>(1, _cols, 0, _n_threads);
     }
 
-    Matrix<T> *_distBuffer;
+    std::unique_ptr<Matrix<T>> _distBuffer;
     // we want to store the previous state of mapped centroids, toggle: 1 to switch between rows
     int _toggle = 0;
     // we store the toggled row

@@ -182,7 +182,7 @@ int main(int argc, char** argv){
     	
 	timer.reset();
     KMeans<double> KM(DATABASE, 4, true, 1);
-	KM.run(15, 0.01);
+	KM.run(400, 0.01);
 	Matrix<double> centroid = KM.getCentroid();
 	Matrix<int> dataToCentroid = KM.getDataToCentroid();
 	std::cout << "KMeans time: " << (timer.elapsed()*1e-9) << std::endl;
