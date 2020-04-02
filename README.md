@@ -58,7 +58,7 @@ DATASET = np.random.rand(100000, 3)
 # Convergence
 
 c++ generally converges with **more** iteration in a **shorter** amount of time than sklearn: (c++ n=14, t\~0.035s | sklearn n=10, t\~0.093s)
-for a similar result. The speed at which it converges can be improved with a different initialization technique. The current approach is to naively initialize the centroids to random points generated from a uniform distribution bounded by the min-max values of the training set w.r.t. each dimension. The stopping criterion also needs improvement.
+for a similar result. The speed at which it converges can be improved with a different initialization technique. The current approach is to naively initialize the centroids to random points generated from a uniform distribution bounded by the min-max values of the training set w.r.t. each dimension.
 
 ## Ground truth data
 

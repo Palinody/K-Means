@@ -110,11 +110,11 @@ void KMeans<T>::updateCentroids(){
     #pragma omp parallel for num_threads(_n_threads)
     for(int i = 0; i < _samples; ++i){
         const int& k_index = (*_dataset_to_centroids)(i);
-        #pragma omp simd
         for(int d = 0; d < _dims; ++d){
+            #pragma atomic read write
             sample_buff[k_index+d*_n_clusters] += _training_set(d, i);
         }
-        #pragma omp atomic
+        #pragma atomic write
         ++occurences[k_index];
     }
     #pragma omp parallel for num_threads(_n_threads)
@@ -143,7 +143,7 @@ void KMeans<T>::run(int max_iter, float threashold){
         modif_rate_curr = _dataset_to_centroids->getModifRate();
         inertia = modif_rate_curr - modif_rate_prev;
         modif_rate_prev = modif_rate_curr;
-        printf("%.3f %.3f\n", modif_rate_curr, inertia);
+        //printf("%.3f %.3f\n", modif_rate_curr, inertia);
         ++epoch;
     } while(epoch < max_iter && modif_rate_curr >= threashold  /*&& std::abs(inertia) >= 1e-6*/);
     //} while(epoch < max_iter && modif_rate_curr > threashold);

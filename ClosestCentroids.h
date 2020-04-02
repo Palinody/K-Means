@@ -9,7 +9,7 @@ public:
     /**
      * if buffered ClosestCentroids desired -> 2 rows else 1
     */
-	ClosestCentroids(int samples, int value = 0, bool buffered=true, int num_threads = 1) : 
+    ClosestCentroids(int samples, int value = 0, bool buffered=true, int num_threads = 1) : 
         Matrix<int>((buffered?2:1), samples, value, num_threads),
         _toggle{ (buffered?1:0) } { 
         
@@ -60,7 +60,7 @@ public:
         // stopping criterion never satisfied if we dont keep track of assigned centroids modifications
         if(_rows < 2) return 1.0f;
         int counter = 0;
-        #pragma omp parallel for num_threads(_n_threads)
+        #pragma omp parallel for simd reduction(+:counter) num_threads(_n_threads)
         for(int i = 0; i < _cols; ++i){
             const int& a = _matrix[i];
             const int& b = _matrix[i+_cols];
