@@ -107,17 +107,17 @@ void KMeans<T>::updateCentroids(){
     // accumulates the samples to compute new cluster positions
     T sample_buff[_n_clusters*_dims] = {0};
 
-    #pragma omp parallel for num_threads(_n_threads)
+    //#pragma omp parallel for num_threads(_n_threads)
     for(int i = 0; i < _samples; ++i){
         const int& k_index = (*_dataset_to_centroids)(i);
         for(int d = 0; d < _dims; ++d){
-            #pragma atomic read write
+            //#pragma atomic read write
             sample_buff[k_index+d*_n_clusters] += _training_set(d, i);
         }
-        #pragma atomic write
+        //#pragma atomic write
         ++occurences[k_index];
     }
-    #pragma omp parallel for num_threads(_n_threads)
+    //#pragma omp parallel for num_threads(_n_threads)
     for(int c = 0; c < _n_clusters; ++c){
         if(!occurences[c]) continue;
         for(int d = 0; d < _dims; ++d){
@@ -145,7 +145,7 @@ void KMeans<T>::run(int max_iter, float threashold){
         modif_rate_prev = modif_rate_curr;
         //printf("%.3f %.3f\n", modif_rate_curr, inertia);
         ++epoch;
-    } while(epoch < max_iter && modif_rate_curr >= threashold  /*&& std::abs(inertia) >= 1e-6*/);
+    } while(epoch < max_iter && modif_rate_curr >= threashold  && std::abs(inertia) >= 1e-6);
     //} while(epoch < max_iter && modif_rate_curr > threashold);
     //} while(epoch < max_iter);
     _n_iters = epoch;

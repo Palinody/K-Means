@@ -124,7 +124,7 @@ void KMeansBenckmark(const Matrix<float>& DATABASE, int n_centroids,
     static Timer<nano_t> timer_inner;
 
     for(int i = 0; i < 7; ++i){
-        KMeans<float> KM(DATABASE, n_centroids, true);
+        KMeans<float> KM(DATABASE, n_centroids, true, 6);
 
         timer_inner.reset();
         KM.run(400, 0.01);
@@ -154,7 +154,9 @@ void KMeansBenckmark(const Matrix<float>& DATABASE, int n_centroids,
 
 	double mu_errors = mean(errors_buff);
 	double sd_errors = stand_dev(errors_buff, mu_errors);
-    printf("%d\r", iter);
+    //printf("%d\r", iter);
+	std::cout << iter << '\r';
+	std::cout.flush();
 
     time_arr[iter] = mu_time;
     sd_time_arr[iter] = sd_time;
@@ -203,7 +205,7 @@ int main(int argc, char** argv){
 	double iters_arr[size];
 	double sd_iters_arr[size];
 
-	double errors_arr[size]; 
+	double errors_arr[size];
 	double sd_errors_arr[size];
 
     for(int n = 0; n < size; ++n){
