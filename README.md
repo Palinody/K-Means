@@ -29,16 +29,15 @@ tested against Python's sklearn library with the following data and hyperparamet
 
 ## Computation time
 
-![k-means-comp-time](https://user-images.githubusercontent.com/32341154/78314978-f7e9f480-755b-11ea-9174-699e03add775.png)
+![k-means-comp-time](https://user-images.githubusercontent.com/32341154/78319224-04277f00-7567-11ea-8e7f-eb6d69155968.png)
 
 ## N. iterations w.r.t. n. cluster
 
-![k-means-n-iters](https://user-images.githubusercontent.com/32341154/78314983-fa4c4e80-755b-11ea-947c-bb747c6e8eda.png)
-
+![k-means-n-iters](https://user-images.githubusercontent.com/32341154/78319232-0689d900-7567-11ea-8e04-db7f4d4e4bea.png)
 
 ## Error comparison: sklearn | c++ ser. | c++ par.
 
-![k-means-error](https://user-images.githubusercontent.com/32341154/78314980-f91b2180-755b-11ea-85ac-dd6eb4a966b6.png)
+![k-means-error](https://user-images.githubusercontent.com/32341154/78319229-0558ac00-7567-11ea-9bb5-529624c6dd51.png)
 
 :exclamation: c++ generally converges with **more** iteration in a **shorter** amount of time than sklearn for a similar result. The speed at which it converges can be improved with a different initialization technique and/or a better stopping criterion. The current approach is to naively initialize the centroids to random points generated from a uniform distribution bounded by the min-max values of the training set w.r.t. each dimension. :exclamation:
 
