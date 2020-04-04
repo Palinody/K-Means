@@ -145,7 +145,7 @@ void KMeans<T>::run(int max_iter, float threashold){
         modif_rate_prev = modif_rate_curr;
         //printf("%.3f %.3f\n", modif_rate_curr, inertia);
         ++epoch;
-    } while(epoch < max_iter && modif_rate_curr >= threashold  && std::abs(inertia) >= 1e-3);
+    } while(epoch < max_iter && modif_rate_curr >= threashold  && std::abs(inertia) >= 1e-2);
     //} while(epoch < max_iter && modif_rate_curr > threashold);
     //} while(epoch < max_iter);
     _n_iters = epoch;
