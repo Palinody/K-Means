@@ -7,14 +7,16 @@ Compiled with:
 * mingw-w64: 7.0.0
 * GCC 9.2.0
 
-**linux**: g++-9 -std=c++17 -O3 -fopenmp
+**linux**: g++-9 -std=c++17 -O3 -march=native -fopenmp
 
 ## TODO
+
+**DON'T FORGET TO ADD LATEST VER.**
 
 * stopping criterion :heavy_check_mark:
 * mini-batch implementation
 * centroid initialization
-* streams (.txt :heavy_check_mark:, .csv, .bin)
+* streams (.txt :heavy_check_mark:, .csv :heavy_check_mark:, .bin)
 * [algorithms](https://www.cplusplus.com/reference/algorithm/) 
 * thread safe prng :heavy_check_mark:
 
